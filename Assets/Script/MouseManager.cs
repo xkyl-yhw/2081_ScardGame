@@ -12,6 +12,7 @@ public class MouseManager : MonoBehaviour {
     private string layerName1 = "Mutual";
     private string layerName2 = "Collection";
     public GameObject hitGameObject;
+    public bool MouseStaus = false;
 
     private void Start()
     {
@@ -21,6 +22,11 @@ public class MouseManager : MonoBehaviour {
 
     private void Update()
     {
+        if (Input.GetMouseButtonUp(0))
+        {
+            MouseStaus = true;
+        }
+        else MouseStaus = false;
         float _XRot = Input.GetAxisRaw("Mouse Y");
         if (Mathf.Abs(_XRot) > float.Epsilon)
         {
@@ -33,7 +39,8 @@ public class MouseManager : MonoBehaviour {
         {
             if (_hit.collider.gameObject.layer == LayerMask.NameToLayer(layerName1) || _hit.collider.gameObject.layer == LayerMask.NameToLayer(layerName2))
             {
-                hitGameObject = _hit.collider.gameObject;
+                FindItsParent(_hit.collider.gameObject);
+               // Debug.Log(hitGameObject.name);
             }
             else ClearSelection();
         }
@@ -42,5 +49,22 @@ public class MouseManager : MonoBehaviour {
     void ClearSelection()
     {
         hitGameObject = null;
+    }
+
+    private void FindItsParent(GameObject Its)
+    {
+        hitGameObject = Its;
+        if (Its.transform.parent.gameObject.layer == Its.layer)
+        {
+            FindItsParent(Its.transform.parent.gameObject);
+        }
+        else
+        {
+            if (Its.transform.parent.gameObject.layer == LayerMask.NameToLayer("Door")&&MouseStaus)
+            {
+               GameObject go= (GameObject) GameObject.FindObjectOfType(typeof(DoorONOFF));
+                go.SendMessage("CheckDoor",hitGameObject);
+            }
+        }
     }
 }

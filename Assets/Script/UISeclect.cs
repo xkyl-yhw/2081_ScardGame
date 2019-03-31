@@ -16,7 +16,6 @@ public class UISeclect : MonoBehaviour {
     {
         if (mm.hitGameObject != null)
         {
-            Debug.Log(1);
             this.transform.GetChild(0).gameObject.SetActive(true);
             Bounds bigBound = mm.hitGameObject.GetComponent<Renderer>().bounds;
             Vector3 ScreenPoint = Camera.main.WorldToScreenPoint(bigBound.center);
