@@ -13,6 +13,9 @@ public class MouseManager : MonoBehaviour {
     private string layerName2 = "Collection";
     public GameObject hitGameObject;
     public bool MouseStaus = false;
+    [SerializeField]
+    private GameObject DoorManager;
+
 
     private void Start()
     {
@@ -62,8 +65,7 @@ public class MouseManager : MonoBehaviour {
         {
             if (Its.transform.parent.gameObject.layer == LayerMask.NameToLayer("Door")&&MouseStaus)
             {
-               GameObject go= (GameObject) GameObject.FindObjectOfType(typeof(DoorONOFF));
-                go.SendMessage("CheckDoor",hitGameObject);
+               DoorManager.SendMessage("CheckDoor",hitGameObject.transform.parent.gameObject);
             }
         }
     }
