@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     private float speed = 3f;
     [SerializeField]
-    private float RunSpeed = 5f;
+    private float RunSpeed = 4f;
 
     private PlayerMotor motor;
     private CamMoving camMoving;
@@ -19,12 +19,19 @@ public class PlayerController : MonoBehaviour {
         camMoving = GetComponent<CamMoving>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         float _movX = Input.GetAxisRaw("Horizontal");
         float _movY = Input.GetAxisRaw("Vertical");
+        Debug.Log(_movY);
         Vector3 _moveDir = transform.right * _movX + transform.forward * _movY;
+        bool isRun = Input.GetKey(KeyCode.LeftShift);
         Vector3 _velocity;
+        if (Mathf.Abs(_movY) > 0.1f && !isRun)
+        {
+            camMoving.startWalking();
+        }
+        else camMoving.stopwalk();
         if (Input.GetKey(KeyCode.LeftShift))
         {
             _velocity = _moveDir.normalized * RunSpeed;
@@ -34,18 +41,18 @@ public class PlayerController : MonoBehaviour {
             _velocity = _moveDir.normalized * speed;
         }
         motor.applyVelovity(_velocity);
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (isRun)
         {
             camMoving.Stop();
         }
-        if (Input.GetKey(KeyCode.LeftShift)&&_movY>float.Epsilon)
+        if (isRun&&_movY>float.Epsilon)
         {
             camMoving.Play();
         }
         else camMoving.Stop();
         motor.applyVelovity(_velocity);
         float _yRot = Input.GetAxisRaw("Mouse X");
-        Vector3 PlayerRotation = new Vector3(0, _yRot, 0);
+        Vector3 PlayerRotation = new Vector3(0, _yRot*1.5f, 0);
         motor.applyRotation(PlayerRotation);
     }
 }

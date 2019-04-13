@@ -16,14 +16,21 @@ public class UISeclect : MonoBehaviour {
     {
         if (mm.hitGameObject != null)
         {
-            this.transform.GetChild(0).gameObject.SetActive(true);
+            Debug.Log(1);
+            if (mm.hitGameObject.layer == LayerMask.NameToLayer("Mutual"))
+                this.transform.GetChild(0).gameObject.SetActive(true);
+            else this.transform.GetChild(1).gameObject.SetActive(true);
+
             Bounds bigBound = mm.hitGameObject.GetComponent<Renderer>().bounds;
             Vector3 ScreenPoint = Camera.main.WorldToScreenPoint(bigBound.center);
             RectTransform imageTran = this.transform.GetChild(0).gameObject.GetComponent<RectTransform>();
             imageTran.position = new Vector2(ScreenPoint.x, ScreenPoint.y);
-        }else
+        }else 
         {
-            this.transform.GetChild(0).gameObject.SetActive(false);
+            for (int i = 0; i < this.transform.childCount; i++)
+            {
+                this.transform.GetChild(i).gameObject.SetActive(false);
+            }
         }
     }
 }

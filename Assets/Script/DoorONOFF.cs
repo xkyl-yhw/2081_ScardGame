@@ -10,11 +10,15 @@ public class DoorONOFF : MonoBehaviour {
     struct Door{
         public bool Staus;
         public GameObject DoorTran;
+        public bool isopened;
+        public GameObject key;
         public void ChangeStaus(bool value)
         {
             this.Staus = value;
         }
+      //  public float 
     }
+    Quaternion targetRotation;
     [SerializeField]
     List<Door> DoorArray = new List<Door>();
 
@@ -31,20 +35,23 @@ public class DoorONOFF : MonoBehaviour {
         {
             if (DoorArray[i].DoorTran == target)
             {
-                if (DoorArray[i].Staus)
-                {
-                    CloseDoored = true;
-                    Door temporeryDoor = DoorArray[i];
-                    temporeryDoor.Staus = false;
-                    DoorArray[i] = temporeryDoor;
-                    TargetGameObject = target;
-                }
-                else
+                if (!DoorArray[i].Staus&&DoorArray[i].isopened)
                 {
                     Door temporeryDoor = DoorArray[i];
                     temporeryDoor.Staus = true;
                     DoorArray[i] = temporeryDoor;
                     OpenDoored = true;
+                    targetRotation = Quaternion.Euler(temporeryDoor.DoorTran.transform.rotation.x, temporeryDoor.DoorTran.transform.rotation.y, temporeryDoor.DoorTran.transform.rotation.z - 90) * Quaternion.identity;
+                    TargetGameObject = target;
+                    
+                }
+                else
+                {
+                    CloseDoored = true;
+                    Door temporeryDoor = DoorArray[i];
+                    targetRotation = Quaternion.Euler(temporeryDoor.DoorTran.transform.rotation.x, temporeryDoor.DoorTran.transform.rotation.y, temporeryDoor.DoorTran.transform.rotation.z + 90) * Quaternion.identity;
+                    temporeryDoor.Staus = false;
+                    DoorArray[i] = temporeryDoor;
                     TargetGameObject = target;
                 }
             }
@@ -79,26 +86,52 @@ public class DoorONOFF : MonoBehaviour {
         }
         if (CloseDoored)
         {
-            CloseDoor(TargetGameObject);
+           CloseDoor(TargetGameObject);
         }
         
     }
     public void OpenDoor(GameObject door)
     {
-        if (door.transform.localRotation.z > 0f)
+        /*
+        Vector3 now = door.transform.eulerAngles;
+        Debug.Log(now.y);
+        if (now.y < 180f)
         {
             OpenDoored = false;
             return;
         }
-        door.GetComponent<Transform>().RotateAround(door.transform.position,door.transform.forward,Time.deltaTime*RotateSpeed);
+        door.GetComponent<Transform>().Rotate(new Vector3(0, -RotateSpeed*Time.deltaTime, 0),Space.World);
+        */
+        door.transform.rotation = Quaternion.Slerp(door.transform.localRotation,targetRotation,Time.deltaTime*0.1f);
     }
     public void CloseDoor(GameObject door)
     {
-        if (door.transform.localRotation.z < -0.5f)
+        /*
+        Vector3 now = door.transform.eulerAngles;
+        if (now.y > 270f)
         {
             CloseDoored = false;
             return;
         }
-        door.GetComponent<Transform>().RotateAround(door.transform.position, door.transform.forward, -Time.deltaTime * RotateSpeed);
+        door.GetComponent<Transform>().Rotate(new Vector3(0, RotateSpeed * Time.deltaTime, 0), Space.World);
+        */
+        Debug.Log(targetRotation.eulerAngles);
+        door.transform.rotation = Quaternion.Slerp(door.transform.localRotation, targetRotation,Time.deltaTime*0.1f);
+    }
+
+
+    public void GetKey(GameObject _key)
+    {
+        for (int i = 0; i < DoorArray.Count; i++)
+        {
+            if (DoorArray[i].key == null) continue;
+            if (DoorArray[i].key == _key)
+            {
+                Door temp = DoorArray[i];
+                temp.isopened = true;
+                DoorArray[i] = temp;
+                break;
+            }
+        }
     }
 }
